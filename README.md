@@ -28,6 +28,7 @@ An advanced, full-stack security platform designed to act as an AI Gateway, Data
     ├── parser.py        # Core regex logic for extracting sensitive data line-by-line
     ├── index.html       # Single-page frontend dashboard with Tailwind & JS
     ├── .env             # Environment variables (Create this file and add Gemini API Key)
+    ├── requirements.txt  #Includes all the libraries to be installed.
     └── README.md        # Project documentation
 
 # 🚀 How to Run the Project
