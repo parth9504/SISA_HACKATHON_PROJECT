@@ -1,0 +1,10 @@
+2026-03-24 08:15:02 INFO  [main] Application starting up...
+2026-03-24 08:15:05 DEBUG [auth] Loading user profile for email=j.doe@company.com
+2026-03-24 08:16:12 WARN  [payment] Payment gateway timeout. Retrying...
+2026-03-24 08:16:15 ERROR [stripe_service] Failed to authenticate with API.
+2026-03-24 08:16:15 ERROR [stripe_service] api_key=sk-live-9876543210abcdefGHIJKL
+2026-03-24 08:16:15 ERROR [stripe_service] Exception: PaymentFailedException
+  at com.company.payment.StripeService.charge(StripeService.java:102)
+  at com.company.payment.Transaction.process(Transaction.java:45)
+  at java.base/java.lang.Thread.run(Thread.java:829)
+2026-03-24 08:17:00 INFO  [main] Shutting down gracefully.

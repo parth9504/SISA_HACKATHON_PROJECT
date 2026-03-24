@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Secure Data Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .log-viewer::-webkit-scrollbar { width: 8px; }
+        .log-viewer::-webkit-scrollbar-track { background: #1f2937; }
+        .log-viewer::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans min-h-screen p-8">
+
+    <div class="max-w-7xl mx-auto space-y-6">
+        <header class="border-b border-gray-700 pb-4">
+            <h1 class="text-3xl font-bold text-blue-400">AI Secure Data Intelligence Platform</h1>
+            <p class="text-gray-400">Multi-Source Data Scanner & Risk Engine</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <div class="space-y-6 lg:col-span-1">
+                
+                <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                    <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">Analyze Data</h2>
+                    
+                    <div class="mb-4">
+                        <label class="block text-sm text-gray-400 mb-2">1. Paste Raw Data (Text, Logs, SQL)</label>
+                        <textarea id="raw-input" rows="4" class="w-full bg-gray-950 border border-gray-600 rounded p-3 text-sm text-gray-300 focus:outline-none focus:border-blue-500" placeholder="Paste your content here..."></textarea>
+                        <button id="submit-raw" class="mt-2 w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2 px-4 rounded transition">
+                            Analyze Text
+                        </button>
+                    </div>
+
+                    <div class="relative flex py-2 items-center">
+                        <div class="flex-grow border-t border-gray-600"></div>
+                        <span class="flex-shrink-0 mx-4 text-gray-500 text-sm">OR</span>
+                        <div class="flex-grow border-t border-gray-600"></div>
+                    </div>
+
+                    <div class="mt-2">
+                        <label class="block text-sm text-gray-400 mb-2">2. Upload File</label>
+                        <div id="drop-zone" class="border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition cursor-pointer bg-gray-900">
+                            <p class="text-gray-400 text-sm mb-1">Drag & Drop file here</p>
+                            <p class="text-xs text-gray-500">Supports .log, .txt, .sql, .pdf, .doc</p>
+                            <input type="file" id="file-input" class="hidden" accept=".log,.txt,.sql,.pdf,.doc,.docx">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="insights-panel" class="bg-gray-800 rounded-lg p-6 hidden border border-gray-700">
+                    <h2 class="text-xl font-bold mb-4 border-b border-gray-700 pb-2">AI Insights</h2>
+                    
+                    <div class="mb-4">
+                        <span class="text-sm text-gray-400">Risk Level:</span>
+                        <span id="risk-badge" class="ml-2 px-3 py-1 rounded text-sm font-bold uppercase"></span>
+                        <span class="text-sm text-gray-400 ml-4">Score: <span id="risk-score" class="text-white font-mono"></span></span>
+                    </div>
+
+                    <div class="mb-4">
+                        <h3 class="text-sm text-gray-400 mb-1">Summary:</h3>
+                        <p id="ai-summary" class="text-sm"></p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-sm text-gray-400 mb-1">Key Warnings:</h3>
+                        <ul id="ai-warnings" class="list-disc list-inside text-sm text-red-400 space-y-1"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-800 rounded-lg border border-gray-700 flex flex-col lg:col-span-2 h-[800px]">
+                <div class="p-4 border-b border-gray-700 bg-gray-800 rounded-t-lg flex justify-between items-center">
+                    <h2 class="text-lg font-bold">Data Visualization</h2>
+                    <span id="finding-count" class="text-xs bg-gray-700 px-2 py-1 rounded text-gray-300">0 Issues Found</span>
+                </div>
+                <div id="log-output" class="p-4 font-mono text-sm overflow-y-auto flex-grow log-viewer bg-gray-950 text-gray-300 whitespace-pre-wrap">
+                    Awaiting input...
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const rawInput = document.getElementById('raw-input');
+        const submitRaw = document.getElementById('submit-raw');
+        const logOutput = document.getElementById('log-output');
+        const insightsPanel = document.getElementById('insights-panel');
+
+        const riskColors = {
+            'critical': 'bg-red-600 text-white',
+            'high': 'bg-orange-500 text-white',
+            'medium': 'bg-yellow-500 text-black',
+            'low': 'bg-blue-500 text-white'
+        };
+
+        const highlightColors = {
+            'critical': 'bg-red-900/50 border-l-4 border-red-500 text-red-200',
+            'high': 'bg-orange-900/50 border-l-4 border-orange-500 text-orange-200',
+            'medium': 'bg-yellow-900/50 border-l-4 border-yellow-500 text-yellow-200',
+            'low': 'bg-blue-900/50 border-l-4 border-blue-500 text-blue-200'
+        };
+
+        // --- Event Listeners for Raw Text ---
+        submitRaw.addEventListener('click', () => {
+            const content = rawInput.value.trim();
+            if (content) processData(content, 'text');
+        });
+
+        // --- Event Listeners for File Upload ---
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-blue-500'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length) handleFile(e.target.files[0]);
+        });
+
+        function handleFile(file) {
+            const reader = new FileReader();
+            let inputType = "file";
+            
+            // Determine the exact type
+            if (file.name.endsWith('.log')) inputType = "log";
+            else if (file.name.endsWith('.sql')) inputType = "sql";
+            else if (file.name.endsWith('.txt')) inputType = "text";
+            else if (file.name.endsWith('.pdf')) inputType = "pdf";
+            else if (file.name.endsWith('.docx') || file.name.endsWith('.doc')) inputType = "docx";
+
+            reader.onload = (e) => {
+                const content = e.target.result;
+                processData(content, inputType);
+            };
+
+            // Read text formats normally, but read PDFs/Docs as Base64 Data URLs
+            if (['pdf', 'docx'].includes(inputType)) {
+                reader.readAsDataURL(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+
+        // --- Core API Call ---
+        async function processData(content, type) {
+            logOutput.innerHTML = '<span class="text-blue-400 animate-pulse">Analyzing securely...</span>';
+            insightsPanel.classList.add('hidden');
+            
+            try {
+                const response = await fetch('http://localhost:8000/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        input_type: type,
+                        content: content,
+                        options: { mask: false, block_high_risk: false, log_analysis: true }
+                    })
+                });
+                
+                const data = await response.json();
+                renderDashboard(content, data);
+                
+            } catch (error) {
+                logOutput.innerHTML = `<span class="text-red-500">Error connecting to backend: ${error.message}</span>`;
+            }
+        }
+
+        // --- Rendering Logic ---
+        function renderDashboard(rawContent, data) {
+            const lines = rawContent.split('\n');
+            let html = '';
+            
+            const findingsByLine = {};
+            data.findings.forEach(f => {
+                if (!findingsByLine[f.line]) findingsByLine[f.line] = [];
+                findingsByLine[f.line].push(f);
+            });
+
+            lines.forEach((line, index) => {
+                const lineNum = index + 1;
+                const findings = findingsByLine[lineNum];
+                
+                if (findings) {
+                    const highestRisk = findings.sort((a,b) => getRiskWeight(b.risk) - getRiskWeight(a.risk))[0].risk;
+                    const style = highlightColors[highestRisk];
+                    const markers = findings.map(f => `[${f.type.toUpperCase()}]`).join(' ');
+                    html += `<div class="${style} py-1 px-2 my-1"><span class="text-gray-500 mr-4 select-none">${lineNum}</span><span class="text-xs font-bold mr-2">${markers}</span>${escapeHtml(line)}</div>`;
+                } else {
+                    html += `<div class="py-1 px-2 hover:bg-gray-800"><span class="text-gray-500 mr-4 select-none">${lineNum}</span>${escapeHtml(line)}</div>`;
+                }
+            });
+            logOutput.innerHTML = html;
+
+            document.getElementById('finding-count').innerText = `${data.findings.length} Issues Found`;
+            const badge = document.getElementById('risk-badge');
+            badge.className = `ml-2 px-3 py-1 rounded text-sm font-bold uppercase ${riskColors[data.risk_level]}`;
+            badge.innerText = data.risk_level;
+            document.getElementById('risk-score').innerText = data.risk_score;
+            document.getElementById('ai-summary').innerText = data.summary;
+            
+            const warningsList = document.getElementById('ai-warnings');
+            warningsList.innerHTML = data.insights.map(i => `<li>${i}</li>`).join('');
+            insightsPanel.classList.remove('hidden');
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        function getRiskWeight(risk) {
+            const weights = { 'low': 1, 'medium': 2, 'high': 3, 'critical': 4 };
+            return weights[risk] || 0;
+        }
+    </script>
+</body>
+</html>

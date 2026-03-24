@@ -1,0 +1,10 @@
+Project FinMate - Sprint 4 Deployment Notes
+-------------------------------------------
+1. Update the database schema for the new user roles.
+2. Ask Sarah to review the PR for the dashboard UI.
+3. IMPORTANT: Update the staging database credentials before Friday.
+   Current staging DB login:
+   Username: admin_staging
+   password=SuperSecretStage!2026
+4. Email the deployment confirmation to DevOps at deploy-alerts@finmate.io.
+5. Check why the frontend is throwing console errors on the login page.
