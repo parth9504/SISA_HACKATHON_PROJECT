@@ -1,6 +1,7 @@
 #FastAPI for building the backend...
 
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Optional, Literal
 import os
@@ -163,6 +164,14 @@ def extract_text_from_binary(base64_content: str, file_type: str) -> str:
     return extracted_text
 
 #API Endpoint...
+
+#fetch the frontend...
+@app.get("/")
+async def serve_frontend():
+    """Serves the index.html file at the root URL"""
+    return FileResponse("index.html")
+
+
 @app.post("/analyze", response_model=AnalyzeResponse)
 async def analyze_data(request: AnalyzeRequest):
     """
