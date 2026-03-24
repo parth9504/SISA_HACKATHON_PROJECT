@@ -69,7 +69,20 @@ Follow these steps to run the platform locally on your machine.
     * Ensure the Python backend is actively running in your terminal.
 
    * Double-click the index.html file to open it in your preferred web browser (Chrome, Edge, Firefox).
+ 
+     <img width="526" height="389" alt="image" src="https://github.com/user-attachments/assets/fd8e0e18-ecc0-4284-bf3a-bfc357088c90" />
+
 
 * **Testing the Platform**
 
     In the browser dashboard, use the Direct Text Input box or the Drag & Drop zone.
+
+* **Outputs**
+
+  <img width="1036" height="804" alt="image" src="https://github.com/user-attachments/assets/b30ba2c2-9c41-4543-b429-a4a12af2fe3b" />
+
+
+  <img width="1030" height="796" alt="image" src="https://github.com/user-attachments/assets/6f6fdda1-b5fc-45f6-b6dc-99e064950b67" />
+
+
+
