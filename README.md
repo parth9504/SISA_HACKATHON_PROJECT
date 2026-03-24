@@ -24,6 +24,8 @@ An advanced, full-stack security platform designed to act as an AI Gateway, Data
 * **Frontend:** HTML5, Vanilla JavaScript, Tailwind CSS (via CDN)
 
 # 📂 Project Structure
+
+    ├──📂 test_files    #Includes test files of various formats which can be used for testing
     ├── main.py          # FastAPI application, routing, Risk Engine, and AI Integration
     ├── parser.py        # Core regex logic for extracting sensitive data line-by-line
     ├── index.html       # Single-page frontend dashboard with Tailwind & JS
